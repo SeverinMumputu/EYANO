@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eyano - Plateforme Conversationnelle Vocale d'Espagnol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        darkbg: {
+                            900: '#0b0f19',
+                            800: '#111827',
+                            700: '#1f2937'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+        
+        /* Personnalisation de la scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+
+        /* Animations d'impulsions radar de l'avatar */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.15); opacity: 0.4; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+        
+        .pulse-active-1 {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
+        }
+        .pulse-active-2 {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
+            animation-delay: 0.6s;
+        }
+        .pulse-active-3 {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
+            animation-delay: 1.2s;
+        }
+
+        /* Lueur néon */
+        .neon-glow {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        }
+        .neon-glow-green {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+        }
+        .neon-glow-red {
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-500 selection:text-white">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside class="w-80 bg-darkbg-800 border-r border-gray-800 flex flex-col justify-between hidden md:flex">
+            <div>
+                <!-- Header Logo Eyano -->
+                <div class="p-6 border-b border-gray-800 flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center neon-glow">
+                        <i class="fas fa-headset text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-wider bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">EYANO</h1>
+                        <p class="text-[10px] text-indigo-400 font-semibold uppercase tracking-widest">Vocal Spanish Partner</p>
+                    </div>
+                </div>
+
+                <!-- Navigation principale -->
+                <nav class="p-4 space-y-1">
+                    <p class="px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-widest mb-2">Simulateur & Sandbox</p>
+                    <button onclick="switchTab('sandbox')" id="nav-sandbox" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-brand-600 text-white font-medium transition-all duration-200 shadow-lg shadow-brand-500/10">
+                        <i class="fas fa-microphone-alt text-lg"></i>
+                        <span>Sandbox Vocal Live</span>
+                        <span class="ml-auto w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    </button>
+                    
+                    <p class="px-3 pt-6 text-[10px] font-semibold text-gray-500 uppercase tracking-widest mb-2">Architecture & Code</p>
+                    <button onclick="switchTab('architecture')" id="nav-architecture" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-darkbg-700 transition-all duration-200">
+                        <i class="fas fa-sitemap text-lg"></i>
+                        <span>Schéma d'Architecture</span>
+                    </button>
+                    <button onclick="switchTab('database')" id="nav-database" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-darkbg-700 transition-all duration-200">
+                        <i class="fas fa-database text-lg"></i>
+                        <span>Console Terminal MySQL</span>
+                    </button>
+                    <button onclick="switchTab('specifications')" id="nav-specifications" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-darkbg-700 transition-all duration-200">
+                        <i class="fas fa-file-code text-lg"></i>
+                        <span>Dossier Technique & API</span>
+                    </button>
+
+                    <p class="px-3 pt-6 text-[10px] font-semibold text-gray-500 uppercase tracking-widest mb-2">Paramétrage Avatar</p>
+                    <button onclick="switchTab('config')" id="nav-config" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-darkbg-700 transition-all duration-200">
+                        <i class="fas fa-sliders-h text-lg"></i>
+                        <span>Configuration Locale</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Footer d'infos de l'avatar et du projet local -->
+            <div class="p-4 border-t border-gray-800 bg-darkbg-900/50">
+                <div class="flex items-center space-x-3 p-2">
+                    <div class="relative">
+                        <div class="w-10 h-10 rounded-full bg-indigo-900 flex items-center justify-center border border-indigo-500/30">
+                            <span class="text-xs font-bold text-indigo-300">RDC</span>
+                        </div>
+                        <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-darkbg-800"></span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-semibold text-white">Moteur Local</h4>
+                        <p class="text-xs text-emerald-400 flex items-center">
+                            <i class="fas fa-circle text-[6px] mr-1.5 animate-pulse"></i> Actif et Sécurisé
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col min-w-0 bg-darkbg-900 overflow-y-auto">
+            
+            <!-- Navbar de contrôle mobile et statut général -->
+            <header class="bg-darkbg-800/80 backdrop-blur-md border-b border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+                <div class="flex items-center space-x-3 md:hidden">
+                    <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center">
+                        <i class="fas fa-headset text-white text-sm"></i>
+                    </div>
+                    <span class="font-bold tracking-wider">EYANO</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-2 text-xs bg-darkbg-900 border border-gray-800 px-3 py-1.5 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                    <span class="text-gray-400 font-medium">Contrôle local strict</span>
+                    <span class="text-gray-600">|</span>
+                    <span class="text-gray-400">Pas d'IA générative externe</span>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <!-- Indicateur de statut de connexion à la base de connaissance -->
+                    <div class="flex items-center space-x-2 text-xs text-gray-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl">
+                        <i class="fas fa-check-circle text-emerald-400"></i>
+                        <span class="text-emerald-300 font-medium">MySQL & KB Connectés</span>
+                    </div>
+                </div>
+            </header>
+
+            <div id="toast-container" class="fixed top-4 right-4 z-[9999] space-y-2 pointer-events-none"></div>
+
+            <!-- Contenu dynamique basé sur l'état de navigation -->
+            <div class="p-6 max-w-7xl mx-auto w-full flex-1">
+                
+                <!-- ================= SECTION 1: SANDBOX VOCAL LIVE ================= -->
+                <section id="section-sandbox" class="space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-microphone-alt text-brand-500"></i>
+                                <span>Dialogue Vocal Immersif</span>
+                            </h2>
+                            <p class="text-gray-400 text-sm">Entretien, restaurant ou présentation. Parlez en espagnol et l'avatar intelligent sans IA vous répondra vocalement.</p>
+                        </div>
+                        
+                        <!-- Sélecteur de contexte et sujet -->
+                        <div class="flex items-center space-x-3 bg-darkbg-800 p-1.5 rounded-2xl border border-gray-800 self-start">
+                            <span class="text-xs text-gray-400 px-3 font-medium">Sujet de conversation :</span>
+                            <select id="context-selector" onchange="changeActiveContext()" class="bg-darkbg-900 text-sm text-white font-medium px-3 py-2 rounded-xl border border-gray-700 focus:outline-none focus:border-brand-500 cursor-pointer">
+                                <option value="presentacion">Presentación Personal (Niveau Débutant)</option>
+                                <option value="restaurante">Pedir en un Restaurante (Niveau Intermédiaire)</option>
+                                <option value="entrevista">Entrevista de Trabajo (Niveau Avancé)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- L'ESPACE D'APPEL IMMERSIF (CONCEPTION AVATARS SANS TEXTE) -->
+                    <div class="bg-gradient-to-b from-darkbg-800 to-darkbg-900 rounded-3xl border border-gray-800 relative overflow-hidden p-8 md:p-12 shadow-2xl">
+                        <!-- Éléments d'arrière-plan futuristes -->
+                        <div class="absolute -top-24 -left-24 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl"></div>
+                        <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-brand-500/5 rounded-full blur-3xl"></div>
+                        
+                        <!-- Indicateur de statut général de l'appel -->
+                        <div class="absolute top-6 left-1/2 -translate-x-1/2 bg-darkbg-900/80 border border-gray-700/50 rounded-full px-4 py-2 flex items-center space-x-2 backdrop-blur-md">
+                            <span id="call-status-dot" class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                            <span id="call-status-text" class="text-xs text-gray-300 font-semibold tracking-wide uppercase">Appel non démarré</span>
+                        </div>
+
+                        <!-- Les Deux Avatars -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 my-8 relative z-10">
+                            
+                            <!-- Avatar 1 : L'Utilisateur (Pratiquant) -->
+                            <div class="flex flex-col items-center justify-center space-y-4">
+                                <div id="user-avatar-container" class="relative w-40 h-40 md:w-48 md:h-48 rounded-full bg-darkbg-900 border-2 border-gray-700 flex items-center justify-center transition-all duration-300">
+                                    <!-- Ondes animées autour du micro si l'utilisateur parle -->
+                                    <div id="user-pulse-1" class="absolute inset-0 rounded-full border border-indigo-500/20 hidden"></div>
+                                    <div id="user-pulse-2" class="absolute inset-0 rounded-full border border-indigo-500/10 hidden"></div>
+                                    
+                                    <!-- Profil de l'utilisateur -->
+                                    <div class="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-tr from-gray-800 to-gray-700 flex items-center justify-center overflow-hidden">
+                                        <i class="fas fa-user-circle text-gray-400 text-7xl md:text-8xl"></i>
+                                    </div>
+                                    
+                                    <!-- Badge Statut -->
+                                    <span class="absolute -bottom-2 bg-indigo-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Pratiquant</span>
+                                </div>
+                                <div class="text-center">
+                                    <h3 class="text-lg font-bold text-white">Pratiquant (Vous)</h3>
+                                    <p class="text-xs text-gray-500" id="user-speech-status">Micro désactivé</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Avatar 2 : Eyano (Assistant Intelligent Contrôlé) -->
+                            <div class="flex flex-col items-center justify-center space-y-4">
+                                <div id="eyano-avatar-container" class="relative w-40 h-40 md:w-48 md:h-48 rounded-full bg-darkbg-900 border-2 border-brand-500/30 flex items-center justify-center transition-all duration-300">
+                                    <!-- Ondes animées autour de Eyano si l'avatar parle -->
+                                    <div id="eyano-pulse-1" class="absolute inset-0 rounded-full border border-brand-500/40 pulse-active-1 hidden"></div>
+                                    <div id="eyano-pulse-2" class="absolute inset-0 rounded-full border border-brand-500/20 pulse-active-2 hidden"></div>
+                                    <div id="eyano-pulse-3" class="absolute inset-0 rounded-full border border-indigo-500/10 pulse-active-3 hidden"></div>
+                                    
+                                    <!-- Profil de l'avatar (Orbital & Vectoriel) -->
+                                    <div class="w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-indigo-950 to-brand-950 border border-brand-500/40 flex items-center justify-center overflow-hidden relative">
+                                        <!-- Cercles orbitaux futuristes -->
+                                        <div class="absolute inset-4 rounded-full border border-brand-500/20 animate-[spin_10s_linear_infinite]"></div>
+                                        <div class="absolute inset-8 rounded-full border border-dashed border-indigo-400/30 animate-[spin_6s_linear_infinite_reverse]"></div>
+                                        <i class="fas fa-robot text-brand-400 text-5xl md:text-6xl z-10"></i>
+                                    </div>
+                                    
+                                    <!-- Badge Statut -->
+                                    <span id="eyano-avatar-badge" class="absolute -bottom-2 bg-brand-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Avatar - Hors Ligne</span>
+                                </div>
+                                <div class="text-center">
+                                    <h3 class="text-lg font-bold text-white" id="eyano-voice-name">Eyano - Sofia</h3>
+                                    <p class="text-xs text-gray-500" id="eyano-speech-status">En attente de démarrage</p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Éléments d'Onde Vocale (Dynamic Canvas Visualizer) -->
+                        <div class="h-16 w-full max-w-xl mx-auto my-6 flex items-center justify-center">
+                            <canvas id="waveform-canvas" class="w-full h-full opacity-60 transition-all duration-300"></canvas>
+                        </div>
+
+                        <!-- MICROPHONE ET COMMANDES CENTRALES -->
+                        <div class="flex flex-col items-center justify-center space-y-4 relative z-10">
+                            <div class="flex items-center space-x-6">
+                                <!-- Bouton démarrer / stopper appel -->
+                                <button id="btn-toggle-call" onclick="toggleCall()" class="w-20 h-20 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-emerald-600/20 focus:outline-none">
+                                    <i id="btn-call-icon" class="fas fa-phone-alt"></i>
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider" id="mic-instruction-text">
+                                Cliquez sur le téléphone vert pour démarrer l'appel vocal
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <!-- RESTRUCTURATION DE CONSOLE D'APPEL ET HUD DE TRADUCTION DE SOUTIEN -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        
+                        <!-- Console des logs et étapes de transmission -->
+                        <div class="lg:col-span-2 bg-darkbg-800 rounded-2xl border border-gray-800 p-6 space-y-4">
+                            <div class="flex items-center justify-between border-b border-gray-700 pb-3">
+                                <h3 class="font-bold text-white flex items-center space-x-2 text-sm">
+                                    <i class="fas fa-terminal text-indigo-400"></i>
+                                    <span>Analyseur Logique en Temps Réel (Logs Core)</span>
+                                </h3>
+                                <button onclick="clearSandboxLogs()" class="text-xs text-gray-500 hover:text-gray-300">
+                                    <i class="fas fa-trash mr-1"></i> Effacer
+                                </button>
+                            </div>
+                            
+                            <!-- Logs de transmission vocale -->
+                            <div id="sandbox-logs" class="h-48 overflow-y-auto space-y-2 font-mono text-xs text-gray-400 bg-darkbg-900 p-4 rounded-xl border border-gray-800/80">
+                                <div class="text-gray-500">[SYSTEM] Initialisation du système d'analyse d'appel.</div>
+                                <div class="text-gray-500">[SYSTEM] En attente de démarrage de l'appel pour connecter le Speech-to-Text.</div>
+                            </div>
+                        </div>
+
+                        <!-- HUD Grammaire, Règle Utilisée & Conjugaison active -->
+                        <div class="bg-darkbg-800 rounded-2xl border border-gray-800 p-6 space-y-4">
+                            <h3 class="font-bold text-white border-b border-gray-700 pb-3 flex items-center space-x-2 text-sm">
+                                <i class="fas fa-brain text-brand-400"></i>
+                                <span>Support Grammatical & Règle Actuelle</span>
+                            </h3>
+                            
+                            <div class="space-y-4">
+                                <div class="bg-darkbg-900/80 p-3 rounded-xl border border-gray-800">
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Règle Logique Déclenchée</p>
+                                    <p id="hud-rule-name" class="text-xs font-semibold text-brand-400 mt-1">Aucune règle chargée</p>
+                                </div>
+                                <div class="bg-darkbg-900/80 p-3 rounded-xl border border-gray-800">
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Analyse de Conjugaison / Vocabulaire</p>
+                                    <div id="hud-grammar-details" class="text-xs text-gray-400 mt-1 space-y-1">
+                                        <p>En attente d'analyse de dialogue vocal...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ================= SECTION 2: SCHÉMA DE L'ARCHITECTURE ================= -->
+                <section id="section-architecture" class="space-y-6 hidden">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white flex items-center space-x-2">
+                            <i class="fas fa-sitemap text-brand-500"></i>
+                            <span>Architecture du Système Eyano</span>
+                        </h2>
+                        <p class="text-gray-400 text-sm">Visualisation du flux d'appels et du traitement logique déterministe (sans IA autonome).</p>
+                    </div>
+
+                    <!-- Schéma interactif CSS de l'architecture -->
+                    <div class="bg-darkbg-800 p-8 rounded-3xl border border-gray-800 space-y-12">
+                        
+                        <!-- Étape 1 à 3 en blocs horizontaux -->
+                        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-center">
+                            
+                            <!-- Émetteur / Frontend -->
+                            <div class="bg-darkbg-900 p-5 rounded-2xl border border-indigo-500/30 text-center space-y-3 relative">
+                                <span class="absolute -top-3 left-4 bg-indigo-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">FRONTEND</span>
+                                <div class="w-12 h-12 rounded-full bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto text-xl">
+                                    <i class="fas fa-desktop"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-white">Client Vocal (Navigateur)</h4>
+                                <p class="text-[11px] text-gray-400">Microphone capture, Speech-to-Text, émission d'API.</p>
+                            </div>
+
+                            <!-- Arrow -->
+                            <div class="hidden lg:flex flex-col items-center justify-center text-gray-600 text-lg">
+                                <i class="fas fa-long-arrow-alt-right animate-pulse"></i>
+                                <span class="text-[9px] font-mono text-gray-500 mt-1">HTTP / JSON</span>
+                            </div>
+
+                            <!-- Backend Express / Core -->
+                            <div class="bg-darkbg-900 p-5 rounded-2xl border border-brand-500/30 text-center space-y-3 relative">
+                                <span class="absolute -top-3 left-4 bg-brand-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">BACKEND API</span>
+                                <div class="w-12 h-12 rounded-full bg-brand-500/10 text-brand-400 flex items-center justify-center mx-auto text-xl">
+                                    <i class="fab fa-node-js"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-white">Node.js Express Controller</h4>
+                                <p class="text-[11px] text-gray-400">Orchestrateur, parseur de phrases, gestion de session.</p>
+                            </div>
+
+                            <!-- Arrow -->
+                            <div class="hidden lg:flex flex-col items-center justify-center text-gray-600 text-lg">
+                                <i class="fas fa-long-arrow-alt-right animate-pulse"></i>
+                                <span class="text-[9px] font-mono text-gray-500 mt-1">SQL / local</span>
+                            </div>
+
+                            <!-- Moteur de règles / MySQL -->
+                            <div class="bg-darkbg-900 p-5 rounded-2xl border border-emerald-500/30 text-center space-y-3 relative">
+                                <span class="absolute -top-3 left-4 bg-emerald-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">MOTEUR LOGIQUE</span>
+                                <div class="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto text-xl">
+                                    <i class="fas fa-brain"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-white">MySQL Knowledge Base</h4>
+                                <p class="text-[11px] text-gray-400">Dictionnaires, structures de réponses, contexte stable.</p>
+                            </div>
+
+                        </div>
+
+                        <!-- Section descriptive de la logique de flux "Appel" -->
+                        <div class="border-t border-gray-700/50 pt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="space-y-2">
+                                <h5 class="text-sm font-semibold text-white flex items-center space-x-2">
+                                    <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 text-xs flex items-center justify-center font-bold">1</span>
+                                    <span>Speech-to-Text & Transmission</span>
+                                </h5>
+                                <p class="text-xs text-gray-400 leading-relaxed">
+                                    La voix du pratiquant est convertie localement par l'API Web Speech en texte JSON de manière instantanée, puis transmise au endpoint backend `/api/v1/dialogue/process`.
+                                </p>
+                            </div>
+
+                            <div class="space-y-2">
+                                <h5 class="text-sm font-semibold text-white flex items-center space-x-2">
+                                    <span class="w-5 h-5 rounded-full bg-brand-500/20 text-brand-400 text-xs flex items-center justify-center font-bold">2</span>
+                                    <span>Parser Déterministe (Avatar Core)</span>
+                                </h5>
+                                <p class="text-xs text-gray-400 leading-relaxed">
+                                    Le serveur Node exécute un algorithme de corrélation basé sur des règles grammaticales, compare les mots clés avec la base de connaissances locale MySQL, et détermine le contexte (mémoire).
+                                </p>
+                            </div>
+
+                            <div class="space-y-2">
+                                <h5 class="text-sm font-semibold text-white flex items-center space-x-2">
+                                    <span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs flex items-center justify-center font-bold">3</span>
+                                    <span>Synthèse Vocale (Google TTS)</span>
+                                </h5>
+                                <p class="text-xs text-gray-400 leading-relaxed">
+                                    Le texte espagnol de réponse sélectionné est envoyé au moteur Google TTS pour générer l'audio d'appel qui est joué immédiatement sur l'interface du client, mimant un flux d'appel téléphonique.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ================= SECTION 3: CONSOLE TERMINAL MYSQL ================= -->
+                <section id="section-database" class="space-y-6 hidden">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-database text-emerald-500"></i>
+                                <span>Administration MySQL locale (Simulée)</span>
+                            </h2>
+                            <p class="text-gray-400 text-sm">Visualisez et lancez des requêtes sur la structure de données locale d'Eyano.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        
+                        <!-- Liste des tables et schémas du projet -->
+                        <div class="bg-darkbg-800 rounded-2xl border border-gray-800 p-6 space-y-4">
+                            <h3 class="font-bold text-white text-sm border-b border-gray-700 pb-3 flex items-center justify-between">
+                                <span>Tables du Système Eyano</span>
+                                <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-mono">localhost</span>
+                            </h3>
+
+                            <div class="space-y-2">
+                                <!-- Table Rules -->
+                                <button onclick="selectAndExecuteTable('rules')" class="w-full text-left p-3 rounded-xl bg-darkbg-900 border border-gray-800 hover:border-brand-500/50 transition-all duration-200">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-mono text-indigo-400 font-bold">eyano_rules</span>
+                                        <span class="text-[9px] text-gray-500 font-semibold uppercase">Grammaire & Réponses</span>
+                                    </div>
+                                    <p class="text-[11px] text-gray-500 mt-1">Stocke les phrases d'amorces, mots clés et réponses déterministes.</p>
+                                </button>
+                                
+                                <!-- Table Memory -->
+                                <button onclick="selectAndExecuteTable('memory')" class="w-full text-left p-3 rounded-xl bg-darkbg-900 border border-gray-800 hover:border-brand-500/50 transition-all duration-200">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-mono text-indigo-400 font-bold">eyano_memory_state</span>
+                                        <span class="text-[9px] text-gray-500 font-semibold uppercase">Mémoire d'appel</span>
+                                    </div>
+                                    <p class="text-[11px] text-gray-500 mt-1">Conserve l'historique conversationnel de l'appel pour le contexte.</p>
+                                </button>
+
+                                <!-- Table Config -->
+                                <button onclick="selectAndExecuteTable('config')" class="w-full text-left p-3 rounded-xl bg-darkbg-900 border border-gray-800 hover:border-brand-500/50 transition-all duration-200">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-mono text-indigo-400 font-bold">eyano_avatar_config</span>
+                                        <span class="text-[9px] text-gray-500 font-semibold uppercase">Configuration</span>
+                                    </div>
+                                    <p class="text-[11px] text-gray-500 mt-1">Personnalité, voix active, genre de l'avatar et nom.</p>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Console d'exécution SQL interactive -->
+                        <div class="lg:col-span-2 bg-darkbg-800 rounded-2xl border border-gray-800 p-6 flex flex-col justify-between">
+                            <div class="space-y-4">
+                                <h3 class="font-bold text-white text-sm border-b border-gray-700 pb-3 flex items-center justify-between">
+                                    <span>Console SQL Interactive</span>
+                                    <span class="text-[10px] text-gray-400">Exécution en temps réel</span>
+                                </h3>
+
+                                <div class="bg-darkbg-900 p-4 rounded-xl border border-gray-800 font-mono text-xs">
+                                    <p class="text-gray-500 mb-2">-- Saisissez ou sélectionnez une requête SQL pour analyser la base</p>
+                                    <textarea id="sql-query-input" rows="3" class="w-full bg-transparent text-emerald-400 border-none outline-none focus:ring-0 resize-none" placeholder="SELECT * FROM eyano_rules;"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between mt-4">
+                                <p class="text-xs text-gray-500">Cliquez sur une table à gauche pour pré-charger la requête.</p>
+                                <button onclick="runSimulatedQuery()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all duration-200">
+                                    <i class="fas fa-play mr-1.5"></i> Exécuter SQL
+                                </button>
+                            </div>
+
+                            <!-- Résultat de la requête SQL -->
+                            <div class="mt-6 border-t border-gray-700/50 pt-4">
+                                <p class="text-xs text-gray-400 font-semibold mb-2 flex items-center">
+                                    <i class="fas fa-table text-indigo-400 mr-2"></i> Résultat SQL :
+                                </p>
+                                <div id="sql-results-output" class="bg-darkbg-900 p-4 rounded-xl border border-gray-800 font-mono text-xs text-gray-300 overflow-x-auto h-44">
+                                    [En attente du lancement d'une requête SQL...]
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ================= SECTION 4: DOSSIER TECHNIQUE SPECIFICATIONS ================= -->
+                <section id="section-specifications" class="space-y-6 hidden">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white flex items-center space-x-2">
+                            <i class="fas fa-file-code text-brand-500"></i>
+                            <span>Dossier de Spécifications de Développement</span>
+                        </h2>
+                        <p class="text-gray-400 text-sm">Structure officielle des répertoires, contrôleurs Node.js/Express, et configuration MySQL du projet.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        
+                        <!-- Structure des dossiers -->
+                        <div class="bg-darkbg-800 p-6 rounded-2xl border border-gray-800 space-y-4">
+                            <h3 class="font-bold text-white text-sm border-b border-gray-700 pb-3 flex items-center">
+                                <i class="fas fa-folder-open text-amber-500 mr-2"></i>
+                                <span>Arborescence de Fichiers</span>
+                            </h3>
+                            
+                            <div class="font-mono text-xs text-gray-400 space-y-1 bg-darkbg-900 p-4 rounded-xl border border-gray-800/80">
+                                <p class="text-emerald-400">eyano-platform/</p>
+                                <p>├── <span class="text-blue-400">package.json</span></p>
+                                <p>├── <span class="text-blue-400">server.js</span> <span class="text-gray-600">// Point d'entrée de l'API Express</span></p>
+                                <p>├── <span class="text-indigo-400">config/</span></p>
+                                <p>│   └── <span class="text-blue-400">db.js</span> <span class="text-gray-600">// Connexion MySQL Pools</span></p>
+                                <p>├── <span class="text-indigo-400">controllers/</span></p>
+                                <p>│   └── <span class="text-blue-400">dialogueController.js</span> <span class="text-gray-600">// Moteur de règles déterministes</span></p>
+                                <p>├── <span class="text-indigo-400">database/</span></p>
+                                <p>│   └── <span class="text-blue-400">schema.sql</span> <span class="text-gray-600">// Déclarations des tables SQL</span></p>
+                                <p>└── <span class="text-indigo-400">public/</span></p>
+                                <p>    ├── <span class="text-blue-400">index.html</span> <span class="text-gray-600">// Interface Premium d'appel</span></p>
+                                <p>    ├── <span class="text-blue-400">js/</span></p>
+                                <p>    │   └── <span class="text-blue-400">app.js</span> <span class="text-gray-600">// Client Web Speech STT/TTS</span></p>
+                                <p>    └── <span class="text-blue-400">css/</span></p>
+                                <p>        └── <span class="text-blue-400">tailwind.css</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Spécifications du Code Backend -->
+                        <div class="lg:col-span-2 bg-darkbg-800 p-6 rounded-2xl border border-gray-800 space-y-4">
+                            <div class="flex items-center justify-between border-b border-gray-700 pb-3">
+                                <h3 class="font-bold text-white text-sm flex items-center">
+                                    <i class="fab fa-node-js text-emerald-500 mr-2"></i>
+                                    <span>Code Source Backend (dialogueController.js & schema.sql)</span>
+                                </h3>
+                                <div class="flex items-center space-x-2">
+                                    <button onclick="showCodeTab('backend')" id="btn-code-backend" class="text-xs bg-brand-600 text-white px-3 py-1.5 rounded-lg font-semibold transition-all duration-150">Backend Express Node</button>
+                                    <button onclick="showCodeTab('mysql')" id="btn-code-mysql" class="text-xs text-gray-400 hover:text-white px-3 py-1.5 rounded-lg font-semibold transition-all duration-150">SQL Schema</button>
+                                </div>
+                            </div>
+
+                            <!-- Bloc de code Node Express -->
+                            <div id="code-block-backend" class="relative">
+                                <pre class="bg-darkbg-900 p-4 rounded-xl border border-gray-800 text-[11px] font-mono text-gray-300 overflow-x-auto h-96 leading-relaxed"><code>/* Controller de Dialogue Vocal pour l'Avatar Core */
+const db = require('../config/db');
+
+exports.processVocalInput = async (req, res) => {
+    const { transcription, context, activeAvatar } = req.body;
+    
+    if (!transcription) {
+        return res.status(400).json({ error: "Aucune transcription fournie" });
+    }
+
+    try {
+        const cleanedText = transcription.toLowerCase().trim();
+        
+        // 1. Recherche de correspondance de mots clés dans MySQL
+        const query = `
+            SELECT * FROM eyano_rules 
+            WHERE context = ? AND MATCH(keywords) AGAINST(? IN BOOLEAN MODE)
+            LIMIT 1
+        `;
+        
+        const [rules] = await db.execute(query, [context, cleanedText]);
+        let selectedResponse = "";
+        let matchedRuleId = null;
+        
+        if (rules.length > 0) {
+            selectedResponse = rules[0].response_text;
+            matchedRuleId = rules[0].id;
+        } else {
+            // Règle de repli déterministe par défaut selon le contexte
+            const [fallback] = await db.execute(
+                `SELECT response_text FROM eyano_rules WHERE context = ? AND is_fallback = 1 LIMIT 1`,
+                [context]
+            );
+            selectedResponse = fallback.length > 0 ? fallback[0].response_text : "Lo siento, ¿podrías repetirlo de otra manera?";
+        }
+
+        // 2. Mise à jour de la table de mémoire d'historique conversationnel
+        await db.execute(
+            `INSERT INTO eyano_memory_state (context_id, user_phrase, avatar_response, matched_rule) VALUES (?, ?, ?, ?)`,
+            [context, transcription, selectedResponse, matchedRuleId]
+        );
+
+        // 3. Retour de la structure de dialogue à l'interface client pour Google Text-to-Speech
+        return res.status(200).json({
+            success: true,
+            response_text: selectedResponse,
+            rule_id: matchedRuleId,
+            details: rules.length > 0 ? rules[0].grammar_focus : "Phrase standard de rechange"
+        });
+
+    } catch (error) {
+        console.error("Erreur d'analyse d'avatar logic :", error);
+        return res.status(500).json({ error: "Erreur interne de traitement Eyano Core" });
+    }
+};</code></pre>
+                            </div>
+
+                            <!-- Bloc de code SQL Schema -->
+                            <div id="code-block-mysql" class="relative hidden">
+                                <pre class="bg-darkbg-900 p-4 rounded-xl border border-gray-800 text-[11px] font-mono text-gray-300 overflow-x-auto h-96 leading-relaxed"><code>-- Création de la Base de Données d'Eyano
+CREATE DATABASE IF NOT EXISTS eyano_local_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE eyano_local_db;
+
+-- Table de configuration de la personnalité de l'avatar
+CREATE TABLE IF NOT EXISTS eyano_avatar_config (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    voice_key VARCHAR(50) NOT NULL,
+    accent VARCHAR(10) DEFAULT 'es-ES',
+    personality_description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table des règles déterministes de dialogue
+CREATE TABLE IF NOT EXISTS eyano_rules (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    context VARCHAR(50) NOT NULL,
+    keywords TEXT NOT NULL,
+    response_text TEXT NOT NULL,
+    grammar_focus TEXT,
+    is_fallback TINYINT(1) DEFAULT 0,
+    FULLTEXT INDEX idx_keywords (keywords)
+) ENGINE=InnoDB;
+
+-- Table de mémoire d'état conversationnel d'appel
+CREATE TABLE IF NOT EXISTS eyano_memory_state (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    context_id VARCHAR(50) NOT NULL,
+    user_phrase TEXT NOT NULL,
+    avatar_response TEXT NOT NULL,
+    matched_rule INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (matched_rule) REFERENCES eyano_rules(id) ON DELETE SET NULL
+);</code></pre>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= SECTION 5: CONFIGURATION AVATAR & PARAMS ================= -->
+                <section id="section-config" class="space-y-6 hidden">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white flex items-center space-x-2">
+                            <i class="fas fa-sliders-h text-indigo-500"></i>
+                            <span>Configuration Locale de l'Avatar d'Appel</span>
+                        </h2>
+                        <p class="text-gray-400 text-sm">Modifiez l'apparence sonore, le genre, la personnalité et l'accent de l'assistant.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- Configuration Générale de l'Avatar -->
+                        <div class="bg-darkbg-800 p-6 rounded-2xl border border-gray-800 space-y-6">
+                            <h3 class="font-bold text-white text-sm border-b border-gray-700 pb-3 flex items-center">
+                                <i class="fas fa-user-cog text-brand-400 mr-2"></i>
+                                <span>Personnalité & Voix active</span>
+                            </h3>
+
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs text-gray-400 font-semibold uppercase tracking-wider mb-2">Choix de la Personnalité</label>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <button onclick="selectPersona('sofia')" id="persona-sofia" class="flex flex-col items-center justify-center p-4 rounded-xl bg-brand-600/10 border-2 border-brand-500 text-center transition-all duration-200">
+                                            <i class="fas fa-female text-2xl text-brand-400 mb-1"></i>
+                                            <span class="text-xs font-bold text-white">Sofia</span>
+                                            <span class="text-[10px] text-gray-400">Chaleureuse & Aidante</span>
+                                        </button>
+                                        <button onclick="selectPersona('mateo')" id="persona-mateo" class="flex flex-col items-center justify-center p-4 rounded-xl bg-darkbg-900 border-2 border-gray-800 text-center hover:border-brand-500/50 transition-all duration-200">
+                                            <i class="fas fa-male text-2xl text-indigo-400 mb-1"></i>
+                                            <span class="text-xs font-bold text-white">Mateo</span>
+                                            <span class="text-[10px] text-gray-400">Strict & Professionnel</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs text-gray-400 font-semibold uppercase tracking-wider mb-2">Accent Local d'Espagne/Amérique Latine</label>
+                                    <select id="config-accent" class="w-full bg-darkbg-900 text-white border border-gray-700 rounded-xl p-3 focus:outline-none focus:border-brand-500 text-sm">
+                                        <option value="es-ES">es-ES - Accent d'Espagne (Castillan)</option>
+                                        <option value="es-MX">es-MX - Accent de Mexico (Mexique)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Paramétrage de la vitesse de parole -->
+                        <div class="bg-darkbg-800 p-6 rounded-2xl border border-gray-800 space-y-6">
+                            <h3 class="font-bold text-white text-sm border-b border-gray-700 pb-3 flex items-center">
+                                <i class="fas fa-tachometer-alt text-brand-400 mr-2"></i>
+                                <span>Contrôle Temporel Vocaux</span>
+                            </h3>
+
+                            <div class="space-y-6">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Vitesse d'élocution (Speech Rate)</label>
+                                        <span id="speed-rate-val" class="text-xs text-brand-400 font-bold font-mono">1.0x</span>
+                                    </div>
+                                    <input type="range" id="speech-rate-slider" min="0.8" max="1.5" step="0.1" value="1.0" oninput="updateSpeechRateVal()" class="w-full accent-brand-500">
+                                    <div class="flex justify-between text-[10px] text-gray-500 mt-1">
+                                        <span>Lente (Débutant)</span>
+                                        <span>Normale (Standard)</span>
+                                        <span>Rapide (Natif)</span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-darkbg-900 p-4 rounded-xl border border-gray-800">
+                                    <h4 class="text-xs font-bold text-white mb-2 flex items-center">
+                                        <i class="fas fa-shield-alt text-emerald-400 mr-1.5"></i>
+                                        <span>Sécurité d'appel Eyano</span>
+                                    </h4>
+                                    <p class="text-[11px] text-gray-400 leading-relaxed">
+                                        Chaque modification s'enregistre immédiatement dans la table locale <span class="text-indigo-400 font-mono">eyano_avatar_config</span> de votre serveur MySQL local pour assurer la cohérence de l'interface en temps réel.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- Footer général du site -->
+            <footer class="bg-darkbg-800 border-t border-gray-800 px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500 mt-auto">
+                <p>&copy; 2026 Eyano Vocal Spanish Practice Project - Conçu pour les universités et apprenants de la RDC.</p>
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="hover:text-gray-300">Guide de Déploiement Local</a>
+                    <span>&bull;</span>
+                    <a href="#" class="hover:text-gray-300">Licence Éducative</a>
+                </div>
+            </footer>
+
+        </main>
+    </div>
+
+    <script>
+        /* MOTEUR DE CONNAISSANCES ET RÈGLES ESPAGNOLES DÉTERMINISTES D'EYANO (Base de Données Simulée) */
+        const eyanoKnowledgeBase = {
+            presentacion: {
+                fallback: "Hola, me alegro de hablar contigo. Soy tu asistente de práctica. Para empezar, ¿puedes decirme cómo te llamas?",
+                rules: [
+                    {
+                        keywords: ["hola", "buenos dias", "buenas tardes"],
+                        response: "¡Hola! Qué gusto saludarte. Me llamo Sofia y hoy seré tu compañera de conversación en español. ¿Cómo te llamas?",
+                        grammar: "Formulations de salutation courantes : 'Hola' et '¿Cómo te llamas?'.",
+                        ruleName: "Salutation Initiale"
+                    },
+                    {
+                        keywords: ["me llamo", "mi nombre es", "soy"],
+                        response: "¡Mucho gusto! Es un placer conocerte. ¿De dónde eres y por qué estás aprendiendo español?",
+                        grammar: "Expression de l'identité : utiliser le verbe 'llamarse' (me llamo) ou 'ser' (soy).",
+                        ruleName: "Présentation de l'identité"
+                    },
+                    {
+                        keywords: ["congo", "kinshasa", "rdc", "afrique"],
+                        response: "¡Excelente! La República Democrática del Congo es un país hermoso. El español es un idioma genial para aprender. ¿Qué nivel de español tienes actualmente?",
+                        grammar: "Sujets géographiques & Origine : verbe 'ser' (Soy de...).",
+                        ruleName: "Origine Géographique"
+                    },
+                    {
+                        keywords: ["nivel", "principiante", "intermedio", "bajo"],
+                        response: "No te preocupes. Con la práctica regular conmigo vas a mejorar muy rápido tu fluidez vocal. ¿Quieres intentar hablar sobre comida o pasatiempos?",
+                        grammar: "Niveau linguistique. Pratique de l'auxiliaire 'ir + a + infinitivo' (vas a mejorar).",
+                        ruleName: "Niveau de Pratique"
+                    }
+                ]
+            },
+            restaurante: {
+                fallback: "Bienvenido al restaurante 'El Sol'. ¿Tiene usted una reserva o desea pedir la carta de platos?",
+                rules: [
+                    {
+                        keywords: ["reserva", "mesa", "tengo una"],
+                        response: "Perfecto. Por favor, pase por aquí. Aquí tiene la carta de platos. ¿Qué le gustaría pedir de beber para comenzar?",
+                        grammar: "Formules de politesse et commande au restaurant : '¿Qué le gustaría...?'.",
+                        ruleName: "Accueil & Placement"
+                    },
+                    {
+                        keywords: ["beber", "agua", "vino", "cerveza", "jugo"],
+                        response: "Entendido, una bebida bien fría. Y de plato principal, ¿prefiere carne asada, pescado del día o una paella española?",
+                        grammar: "Vocabulaire des boissons : 'agua', 'vino', 'jugo' (jus de fruit en Am. Latine).",
+                        ruleName: "Choix des Boissons"
+                    },
+                    {
+                        keywords: ["carne", "pescado", "paella", "comer", "plato"],
+                        response: "Excelente elección. Nuestro chef prepara la comida de manera muy natural. ¿Desea algún postre o la cuenta al final?",
+                        grammar: "Vocabulaire gastronomique : 'paella', 'carne', 'pescado'. Demande de 'la cuenta' (l'addition).",
+                        ruleName: "Commande de Plats"
+                    },
+                    {
+                        keywords: ["cuenta", "pagar", "tarjeta", "efectivo"],
+                        response: "Aquí tiene la cuenta. Son treinta euros en total. Puede pagar con tarjeta o efectivo. Muchas gracias por su visita, ¡buen viaje!",
+                        grammar: "Transactions commerciales : 'pagar con tarjeta / en efectivo' (payer par carte/en espèces).",
+                        ruleName: "Transaction & Clôture"
+                    }
+                ]
+            },
+            entrevista: {
+                fallback: "Bienvenido a la entrevista para el puesto de trabajo. Por favor, hábleme de su experiencia laboral.",
+                rules: [
+                    {
+                        keywords: ["experiencia", "trabajado", "puesto", "empresa"],
+                        response: "Interesante. En este puesto de trabajo necesitamos a alguien que maneje bien la comunicación y el trabajo en equipo. ¿Cómo maneja usted el estrés y la presión?",
+                        grammar: "Vocabulaire professionnel : 'experiencia laboral', 'puesto de trabajo' (emploi).",
+                        ruleName: "Expérience Professionnelle"
+                    },
+                    {
+                        keywords: ["estres", "presion", "equipo", "organizado"],
+                        response: "Muy bien. Eso demuestra mucha madurez profesional. ¿Cuáles considera que son sus mayores fortalezas y debilidades para este empleo?",
+                        grammar: "Subjonctif et structures d'hypothèse : 'Considero que...', 'Manejar el estrés'.",
+                        ruleName: "Gestion du Stress"
+                    },
+                    {
+                        keywords: ["fortaleza", "debilidad", "puntual", "responsable"],
+                        response: "Excelente análisis de su perfil. El departamento de recursos humanos analizará su caso y le enviaremos un correo esta semana. ¿Tiene alguna pregunta para nosotros?",
+                        grammar: "Concordance des temps et futur simple de l'indicatif : 'analizará', 'enviaremos'.",
+                        ruleName: "Synthèse de l'entretien"
+                    },
+                    {
+                        keywords: ["pregunta", "salario", "horario", "contrato"],
+                        response: "El salario es muy competitivo y los horarios son flexibles de lunes a viernes. Le agradecemos mucho su tiempo hoy. ¡Adiós!",
+                        grammar: "Terminologie RH : 'salario competitivo' (salaire), 'horario flexible'.",
+                        ruleName: "Questions Candidat"
+                    }
+                ]
+            }
+        };
+
+        let activeContext = "presentacion";
+        let isCallActive = false;
+        let selectedPersona = "sofia";
+        let speechRate = 1.0;
+        let speechRecognition = null;
+        let currentVoice = null;
+
+        // Gestionnaire d'historique de dialogue et logs
+        const mockDatabaseMemory = [];
+        
+        window.onload = function() {
+            initSpeechRecognition();
+            initVisualizer();
+            loadAvailableVoices();
+            showToast("Système Eyano prêt", "Plateforme prête pour la pratique vocale locale.", "success");
+        };
+
+        // Chargement des voix de synthèse du système adaptées à l'espagnol
+        function loadAvailableVoices() {
+            if (typeof speechSynthesis !== 'undefined') {
+                speechSynthesis.onvoiceschanged = () => {
+                    const voices = speechSynthesis.getVoices();
+                    // Recherche d'une voix espagnole correspondant à la sélection (Sofia/Mateo)
+                    const esVoices = voices.filter(v => v.lang.startsWith('es'));
+                    if (esVoices.length > 0) {
+                        currentVoice = esVoices[0]; // Voix par défaut espagnole
+                    }
+                };
+            }
+        }
+
+        function initSpeechRecognition() {
+            window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (window.SpeechRecognition) {
+                speechRecognition = new window.SpeechRecognition();
+                speechRecognition.continuous = false;
+                speechRecognition.interimResults = false;
+                speechRecognition.lang = 'es-ES'; // Forcer la capture en espagnol
+
+                speechRecognition.onstart = function() {
+                    if (isCallActive) {
+                        document.getElementById('user-speech-status').innerText = "À vous de parler en espagnol...";
+                        document.getElementById('user-avatar-container').classList.add('border-indigo-500', 'neon-glow');
+                        toggleUserPulse(true);
+                        logToTerminal("CLIENT", "Écoute du microphone activée. En attente de parole...");
+                    }
+                };
+
+                speechRecognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('user-speech-status').innerText = `Vous avez dit : "${transcript}"`;
+                    logToTerminal("CLIENT", `Phrase interceptée (STT) : "${transcript}"`);
+                    
+                    // Traitement local de la phrase par le moteur de règles déterministes
+                    processDialogueEngine(transcript);
+                };
+
+                speechRecognition.onerror = function(event) {
+                    logToTerminal("SYSTEM-ERROR", `Erreur d'écoute Speech-to-Text: ${event.error}`);
+                    if (isCallActive && event.error !== 'no-speech') {
+                        // Relancer l'écoute si l'appel est toujours actif
+                        setTimeout(() => { speechRecognition.start(); }, 1000);
+                    }
+                };
+
+                speechRecognition.onend = function() {
+                    toggleUserPulse(false);
+                    document.getElementById('user-avatar-container').classList.remove('border-indigo-500', 'neon-glow');
+                    if (isCallActive) {
+                        document.getElementById('user-speech-status').innerText = "Attente du tour de parole...";
+                    }
+                };
+            } else {
+                showToast("STT Non supporté", "Votre navigateur ne prend pas en charge la reconnaissance vocale. Veuillez utiliser Google Chrome ou Edge.", "error");
+            }
+        }
+
+        function processDialogueEngine(userPhrase) {
+            if (!isCallActive) return;
+
+            logToTerminal("SERVER", "Lancement du processus de parsing de phrase locale...");
+            const cleanPhrase = userPhrase.toLowerCase();
+            const rulesSet = eyanoKnowledgeBase[activeContext].rules;
+            let matchedRule = null;
+
+            // Parcours des mots clés pour corréler la réponse dans la base locale
+            for (let rule of rulesSet) {
+                for (let keyword of rule.keywords) {
+                    if (cleanPhrase.includes(keyword)) {
+                        matchedRule = rule;
+                        break;
+                    }
+                }
+                if (matchedRule) break;
+            }
+
+            let responseText = "";
+            let grammarTip = "";
+            let ruleName = "Règle de repli déterministe (Fallback)";
+
+            if (matchedRule) {
+                responseText = matchedRule.response;
+                grammarTip = matchedRule.grammar;
+                ruleName = matchedRule.ruleName;
+                logToTerminal("SERVER", `Succès : Règle correspondante trouvée - [${ruleName}]`);
+            } else {
+                responseText = eyanoKnowledgeBase[activeContext].fallback;
+                grammarTip = "Aucune règle de grammaire spécifique déclenchée. Repositionnement du contexte d'appel.";
+                logToTerminal("SERVER", "Alerte : Aucune règle spécifique correspondante. Lancement de la phrase de repli.");
+            }
+
+            // Insertion dans la mémoire simulée locale MySQL
+            mockDatabaseMemory.push({
+                context: activeContext,
+                user: userPhrase,
+                avatar: responseText,
+                rule: ruleName,
+                timestamp: new Date().toLocaleTimeString()
+            });
+
+            // Mise à jour visuelle du HUD
+            document.getElementById('hud-rule-name').innerText = ruleName;
+            document.getElementById('hud-grammar-details').innerHTML = `
+                <p class="text-indigo-300 font-medium">Focus espagnol :</p>
+                <p class="text-gray-400 mt-1">${grammarTip}</p>
+            `;
+
+            // Faire parler l'avatar avec la réponse correspondante
+            speakAsAvatar(responseText);
+        }
+
+        function speakAsAvatar(text) {
+            if (!isCallActive) return;
+
+            if ('speechSynthesis' in window) {
+                // Stopper toute lecture en cours
+                window.speechSynthesis.cancel();
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Configuration de l'accent
+                utterance.lang = document.getElementById('config-accent').value || 'es-ES';
+                utterance.rate = parseFloat(speechRate);
+
+                // Sélection de la voix Sofia ou Mateo selon la config active
+                const voices = window.speechSynthesis.getVoices();
+                const esVoices = voices.filter(v => v.lang.startsWith('es'));
+                
+                if (esVoices.length > 0) {
+                    if (selectedPersona === 'sofia') {
+                        // Chercher une voix féminine espagnole de préférence
+                        const feminine = esVoices.find(v => v.name.toLowerCase().includes('sofia') || v.name.toLowerCase().includes('helena') || v.name.toLowerCase().includes('zira'));
+                        utterance.voice = feminine || esVoices[0];
+                    } else {
+                        // Chercher une voix masculine
+                        const masculine = esVoices.find(v => v.name.toLowerCase().includes('mateo') || v.name.toLowerCase().includes('pablo') || v.name.toLowerCase().includes('julio'));
+                        utterance.voice = masculine || esVoices[esVoices.length - 1];
+                    }
+                }
+
+                utterance.onstart = function() {
+                    document.getElementById('eyano-speech-status').innerText = "En train de répondre vocalement...";
+                    document.getElementById('eyano-avatar-container').classList.add('border-brand-500', 'neon-glow');
+                    toggleEyanoPulse(true);
+                    logToTerminal("AVATAR", `Envoi vocal (TTS) : "${text}"`);
+                };
+
+                utterance.onend = function() {
+                    document.getElementById('eyano-speech-status').innerText = "À l'écoute... Parlez maintenant";
+                    document.getElementById('eyano-avatar-container').classList.remove('border-brand-500', 'neon-glow');
+                    toggleEyanoPulse(false);
+                    
+                    // Une fois que l'avatar a fini de parler, on redémarre la capture STT pour l'utilisateur
+                    if (isCallActive && speechRecognition) {
+                        try {
+                            speechRecognition.start();
+                        } catch (e) {
+                            // Ignorer si déjà démarré
+                        }
+                    }
+                };
+
+                utterance.onerror = function(event) {
+                    logToTerminal("SYSTEM-ERROR", `Erreur de lecture TTS : ${event.error}`);
+                };
+
+                window.speechSynthesis.speak(utterance);
+            } else {
+                logToTerminal("SYSTEM-ERROR", "Synthèse vocale Web Speech (TTS) non supportée sur ce navigateur.");
+            }
+        }
+
+        function toggleCall() {
+            const btn = document.getElementById('btn-toggle-call');
+            const icon = document.getElementById('btn-call-icon');
+            const statusDot = document.getElementById('call-status-dot');
+            const statusText = document.getElementById('call-status-text');
+            const badge = document.getElementById('eyano-avatar-badge');
+            const micInstruction = document.getElementById('mic-instruction-text');
+
+            if (!isCallActive) {
+                // DÉMARRAGE DE L'APPEL
+                isCallActive = true;
+                btn.className = "w-20 h-20 rounded-full bg-red-600 hover:bg-red-500 text-white text-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-red-600/20 focus:outline-none";
+                icon.className = "fas fa-phone-slash";
+                
+                statusDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping";
+                statusText.innerText = "Appel Vocal Actif";
+                badge.innerText = "Avatar - En Ligne";
+                badge.className = "absolute -bottom-2 bg-emerald-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider";
+                micInstruction.innerText = "L'appel est connecté. Eyano prend la parole en espagnol.";
+
+                logToTerminal("SYSTEM", "Connexion d'appel établie avec succès avec l'avatar.");
+                
+                // Première salutation de l'avatar au démarrage
+                setTimeout(() => {
+                    const welcomeText = activeContext === 'presentacion' 
+                        ? "¡Hola! Bienvenido a Eyano. Soy Sofia, tu asistente. ¿Cómo te llamas?" 
+                        : (activeContext === 'restaurante' 
+                            ? "Hola, bienvenido al restaurante El Sol. ¿Tiene usted una reserva de mesa?" 
+                            : "Hola, buenos días. Bienvenido a esta entrevista de trabajo. Cuénteme, ¿cuál es su experiencia laboral?");
+                    
+                    speakAsAvatar(welcomeText);
+                }, 1000);
+
+            } else {
+                // RACCROCHER L'APPEL
+                isCallActive = false;
+                btn.className = "w-20 h-20 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-emerald-600/20 focus:outline-none";
+                icon.className = "fas fa-phone-alt";
+                
+                statusDot.className = "w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse";
+                statusText.innerText = "Appel non démarré";
+                badge.innerText = "Avatar - Hors Ligne";
+                badge.className = "absolute -bottom-2 bg-brand-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider";
+                micInstruction.innerText = "Cliquez sur le téléphone vert pour démarrer l'appel vocal";
+
+                document.getElementById('user-speech-status').innerText = "Micro désactivé";
+                document.getElementById('eyano-speech-status').innerText = "En attente de démarrage";
+
+                logToTerminal("SYSTEM", "Appel vocal raccroché. Libération des ressources de transmission.");
+                
+                // Arrêt de la reconnaissance et de la parole
+                if (speechRecognition) {
+                    try { speechRecognition.stop(); } catch(e){}
+                }
+                if (typeof speechSynthesis !== 'undefined') {
+                    window.speechSynthesis.cancel();
+                }
+                toggleUserPulse(false);
+                toggleEyanoPulse(false);
+            }
+        }
+
+        let canvas, ctx, animationFrameId;
+        function initVisualizer() {
+            canvas = document.getElementById('waveform-canvas');
+            ctx = canvas.getContext('2d');
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            drawWaveform();
+        }
+
+        function resizeCanvas() {
+            if (canvas) {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+            }
+        }
+
+        // Dessine des ondes sonores dynamiques selon l'activité
+        let wavePhase = 0;
+        function drawWaveform() {
+            animationFrameId = requestAnimationFrame(drawWaveform);
+            if (!ctx) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.lineWidth = 2;
+            
+            let isActive = isCallActive;
+            let speed = 0.05;
+            let amplitude = 15;
+            let color = '#4f46e5'; // Indigo
+
+            if (document.getElementById('eyano-pulse-1').classList.contains('hidden') === false) {
+                // Eyano parle
+                amplitude = 40;
+                speed = 0.15;
+                color = '#6366f1';
+            } else if (document.getElementById('user-pulse-1').classList.contains('hidden') === false) {
+                // L'utilisateur parle
+                amplitude = 30;
+                speed = 0.12;
+                color = '#10b981'; // Green
+            } else if (!isActive) {
+                amplitude = 2;
+                speed = 0.01;
+                color = '#374151'; // Gray
+            }
+
+            ctx.strokeStyle = color;
+            ctx.beginPath();
+            
+            for (let i = 0; i < canvas.width; i++) {
+                let y = canvas.height / 2 + Math.sin(i * 0.02 + wavePhase) * amplitude * Math.sin(i * 0.005);
+                if (i === 0) ctx.moveTo(i, y);
+                else ctx.lineTo(i, y);
+            }
+            
+            ctx.stroke();
+            wavePhase += speed;
+        }
+
+        // Helpers d'activation d'ondes autour des avatars
+        function toggleUserPulse(show) {
+            const p1 = document.getElementById('user-pulse-1');
+            const p2 = document.getElementById('user-pulse-2');
+            if (show) {
+                p1.classList.remove('hidden');
+                p2.classList.remove('hidden');
+            } else {
+                p1.classList.add('hidden');
+                p2.classList.add('hidden');
+            }
+        }
+
+        function toggleEyanoPulse(show) {
+            const p1 = document.getElementById('eyano-pulse-1');
+            const p2 = document.getElementById('eyano-pulse-2');
+            const p3 = document.getElementById('eyano-pulse-3');
+            if (show) {
+                p1.classList.remove('hidden');
+                p2.classList.remove('hidden');
+                p3.classList.remove('hidden');
+            } else {
+                p1.classList.add('hidden');
+                p2.classList.add('hidden');
+                p3.classList.add('hidden');
+            }
+        }
+
+        function selectAndExecuteTable(table) {
+            let query = "";
+            if (table === 'rules') {
+                query = "SELECT id, context, keywords, response_text, grammar_focus FROM eyano_rules;";
+            } else if (table === 'memory') {
+                query = "SELECT id, context_id, user_phrase, avatar_response, matched_rule, created_at FROM eyano_memory_state ORDER BY id DESC LIMIT 5;";
+            } else if (table === 'config') {
+                query = "SELECT id, name, voice_key, accent, personality_description FROM eyano_avatar_config;";
+            }
+            document.getElementById('sql-query-input').value = query;
+            runSimulatedQuery();
+        }
+
+        function runSimulatedQuery() {
+            const query = document.getElementById('sql-query-input').value.toLowerCase().trim();
+            const output = document.getElementById('sql-results-output');
+            
+            logToTerminal("SQL-CONSOLE", `Exécution de la requête : "${query}"`);
+
+            if (query.includes('eyano_rules')) {
+                // Renvoyer les règles simulées de MySQL en format table SQL
+                output.innerHTML = `+----+--------------+----------------------------------+-------------------------------------------------+----------------------------------------+
+| id | context      | keywords                         | response_text                                   | grammar_focus                          |
++----+--------------+----------------------------------+-------------------------------------------------+----------------------------------------+
+| 1  | presentacion | hola, buenos dias, buenas tardes | ¡Hola! Qué gusto saludarte. Me llamo Sofia...  | Formulations de salutations           |
+| 2  | presentacion | me llamo, mi nombre es, soy      | ¡Mucho gusto! Es un placer conocerte...         | Expression de l'identité               |
+| 3  | restaurante  | reserva, mesa, tengo una         | Perfecto. Por favor, pase por aquí...           | Formules de politesse et commande      |
+| 4  | entrevista   | experiencia, trabajado, puesto   | Interesante. En este puesto de trabajo...       | Vocabulaire professionnel              |
++----+--------------+----------------------------------+-------------------------------------------------+----------------------------------------+
+4 rows in set (0.012 sec)`;
+            } else if (query.includes('eyano_memory_state')) {
+                if (mockDatabaseMemory.length === 0) {
+                    output.innerHTML = "Empty set (0.001 sec) - Aucun appel n'a été effectué pour l'instant.";
+                    return;
+                }
+                let tableText = `+----+--------------+----------------------------+-----------------------------------+--------------------+
+| id | context_id   | user_phrase                | avatar_response                   | matched_rule       |
++----+--------------+----------------------------+-----------------------------------+--------------------+`;
+                mockDatabaseMemory.forEach((row, idx) => {
+                    tableText += `\n| ${idx+1}  | ${row.context.padEnd(12)} | ${row.user.substring(0, 26).padEnd(26)} | ${row.avatar.substring(0, 33).padEnd(33)} | ${row.rule.substring(0, 18).padEnd(18)} |`;
+                });
+                tableText += "\n+----+--------------+----------------------------+-----------------------------------+--------------------+";
+                output.innerHTML = tableText;
+            } else if (query.includes('eyano_avatar_config')) {
+                output.innerHTML = `+----+--------+-----------+--------+------------------------------------+
+| id | name   | voice_key | accent | personality_description            |
++----+--------+-----------+--------+------------------------------------+
+| 1  | ${selectedPersona.toUpperCase().padEnd(6)} | Zephyr    | es-ES  | ${selectedPersona === 'sofia' ? 'Chaleureuse et aidante' : 'Strict et professionnel'}            |
++----+--------+-----------+--------+------------------------------------+
+1 row in set (0.003 sec)`;
+            } else {
+                output.innerHTML = `ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '${query}' at line 1`;
+            }
+        }
+
+        function showCodeTab(type) {
+            const btnBackend = document.getElementById('btn-code-backend');
+            const btnMysql = document.getElementById('btn-code-mysql');
+            const blockBackend = document.getElementById('code-block-backend');
+            const blockMysql = document.getElementById('code-block-mysql');
+
+            if (type === 'backend') {
+                btnBackend.className = "text-xs bg-brand-600 text-white px-3 py-1.5 rounded-lg font-semibold transition-all duration-150";
+                btnMysql.className = "text-xs text-gray-400 hover:text-white px-3 py-1.5 rounded-lg font-semibold transition-all duration-150";
+                blockBackend.classList.remove('hidden');
+                blockMysql.classList.add('hidden');
+            } else {
+                btnMysql.className = "text-xs bg-brand-600 text-white px-3 py-1.5 rounded-lg font-semibold transition-all duration-150";
+                btnBackend.className = "text-xs text-gray-400 hover:text-white px-3 py-1.5 rounded-lg font-semibold transition-all duration-150";
+                blockMysql.classList.remove('hidden');
+                blockBackend.classList.add('hidden');
+            }
+        }
+
+        function switchTab(tabName) {
+            const tabs = ['sandbox', 'architecture', 'database', 'specifications', 'config'];
+            tabs.forEach(tab => {
+                document.getElementById(`section-${tab}`).classList.add('hidden');
+                document.getElementById(`nav-${tab}`).className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-darkbg-700 transition-all duration-200";
+            });
+
+            document.getElementById(`section-${tabName}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabName}`).className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-brand-600 text-white font-medium transition-all duration-200 shadow-lg shadow-brand-500/10";
+            
+            showToast("Navigation", `Section ${tabName.toUpperCase()} chargée avec succès.`, "info");
+        }
+
+        function changeActiveContext() {
+            activeContext = document.getElementById('context-selector').value;
+            logToTerminal("SYSTEM", `Changement du contexte de dialogue vers : [${activeContext.toUpperCase()}]`);
+            showToast("Contexte changé", `Pratique espagnole configurée sur : ${activeContext}`, "success");
+
+            if (isCallActive) {
+                // Relancer l'appel si on change de sujet en plein cours
+                toggleCall(); 
+                toggleCall();
+            }
+        }
+
+        function selectPersona(persona) {
+            selectedPersona = persona;
+            document.getElementById('persona-sofia').className = "flex flex-col items-center justify-center p-4 rounded-xl bg-darkbg-900 border-2 border-gray-800 text-center hover:border-brand-500/50 transition-all duration-200";
+            document.getElementById('persona-mateo').className = "flex flex-col items-center justify-center p-4 rounded-xl bg-darkbg-900 border-2 border-gray-800 text-center hover:border-brand-500/50 transition-all duration-200";
+            
+            if (persona === 'sofia') {
+                document.getElementById('persona-sofia').className = "flex flex-col items-center justify-center p-4 rounded-xl bg-brand-600/10 border-2 border-brand-500 text-center transition-all duration-200";
+                document.getElementById('eyano-voice-name').innerText = "Eyano - Sofia";
+            } else {
+                document.getElementById('persona-mateo').className = "flex flex-col items-center justify-center p-4 rounded-xl bg-brand-600/10 border-2 border-brand-500 text-center transition-all duration-200";
+                document.getElementById('eyano-voice-name').innerText = "Eyano - Mateo";
+            }
+            logToTerminal("SYSTEM", `Changement d'avatar actif : [${persona.toUpperCase()}]`);
+            showToast("Avatar mis à jour", `L'avatar par défaut est désormais ${persona}`, "info");
+        }
+
+        function updateSpeechRateVal() {
+            speechRate = document.getElementById('speech-rate-slider').value;
+            document.getElementById('speed-rate-val').innerText = `${speechRate}x`;
+        }
+
+        function clearSandboxLogs() {
+            document.getElementById('sandbox-logs').innerHTML = '<div class="text-gray-500">[SYSTEM] Logs réinitialisés. En attente d\'activité vocale...</div>';
+        }
+
+        function logToTerminal(sender, message) {
+            const logsContainer = document.getElementById('sandbox-logs');
+            const timestamp = new Date().toLocaleTimeString();
+            let colorClass = "text-gray-400";
+            
+            if (sender === "CLIENT") colorClass = "text-indigo-400";
+            else if (sender === "SERVER") colorClass = "text-brand-400";
+            else if (sender === "AVATAR") colorClass = "text-emerald-400";
+            else if (sender === "SYSTEM-ERROR") colorClass = "text-red-400";
+            else if (sender === "SQL-CONSOLE") colorClass = "text-amber-400";
+
+            logsContainer.innerHTML += `<div class="${colorClass}">[${timestamp}] [${sender}] ${message}</div>`;
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+
+        function showToast(title, text, type = "success") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `p-4 rounded-xl bg-darkbg-800 border-l-4 ${type === 'success' ? 'border-emerald-500' : (type === 'error' ? 'border-red-500' : 'border-indigo-500')} shadow-xl flex items-start space-x-3 pointer-events-auto transition-all duration-300 transform translate-x-12 opacity-0 w-80`;
+            
+            const icon = type === 'success' ? 'fa-check-circle text-emerald-400' : (type === 'error' ? 'fa-exclamation-circle text-red-400' : 'fa-info-circle text-indigo-400');
+            
+            toast.innerHTML = `
+                <i class="fas ${icon} mt-0.5"></i>
+                <div class="flex-1">
+                    <h4 class="text-xs font-bold text-white uppercase tracking-wider">${title}</h4>
+                    <p class="text-[11px] text-gray-400 mt-0.5 leading-relaxed">${text}</p>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Animation Entrée
+            setTimeout(() => {
+                toast.classList.remove('translate-x-12', 'opacity-0');
+            }, 50);
+
+            // Retrait automatique
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3500);
+        }
+    </script>
+</body>
+</html>

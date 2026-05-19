@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eyano - Pratique de l'Espagnol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            dark: '#0f172a',
+                            light: '#1e293b',
+                            accent: '#3b82f6',
+                            eyano: '#8b5cf6', // Violet premium pour Eyano
+                            user: '#10b981',  // Vert émeraude pour l'utilisateur
+                        }
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'ripple': 'ripple 1.5s infinite ease-in-out',
+                    },
+                    keyframes: {
+                        ripple: {
+                            '0%': { transform: 'scale(0.8)', opacity: '1' },
+                            '100%': { transform: 'scale(2.4)', opacity: '0' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+            color: white;
+            overflow: hidden; /* Empêcher le défilement pour une sensation d'app mobile/immersive */
+        }
+
+        /* Effets de halo pour les avatars lorsqu'ils parlent */
+        .avatar-container {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-speaking-eyano::before, .avatar-speaking-user::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: ripple 2s infinite;
+        }
+
+        .avatar-speaking-eyano::before {
+            background-color: rgba(139, 92, 246, 0.4);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
+        }
+
+        .avatar-speaking-user::before {
+            background-color: rgba(16, 185, 129, 0.4);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
+        }
+
+        /* Avatar glow constant */
+        .avatar-eyano { box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); }
+        .avatar-user { box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+
+        /* Custom Scrollbar pour les modales */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .subtitles {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col items-center justify-between font-sans relative">
+
+    <!-- En-tête -->
+    <header class="w-full flex justify-between items-center p-6 z-10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-brand-eyano flex items-center justify-center text-xl font-bold shadow-[0_0_15px_rgba(139,92,246,0.6)]">
+                E
+            </div>
+            <h1 class="text-2xl font-bold tracking-wider">EYANO</h1>
+        </div>
+        <button id="btn-settings" class="w-12 h-12 rounded-full glass-panel hover:bg-white/10 transition flex items-center justify-center text-xl text-gray-300 hover:text-white">
+            <i class="fas fa-sliders-h"></i>
+        </button>
+    </header>
+
+    <!-- Modal de Configuration (Base de Connaissance & Avatar) -->
+    <div id="modal-settings" class="fixed inset-0 bg-black/80 z-50 hidden flex-col items-center justify-center backdrop-blur-sm">
+        <div class="glass-panel w-full max-w-md p-8 rounded-2xl shadow-2xl transform transition-all scale-95 opacity-0" id="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white"><i class="fas fa-cogs mr-2 text-brand-accent"></i> Configuration</h2>
+                <button id="btn-close-settings" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Choix de l'avatar/voix -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Avatar Eyano (Voix Espagnole)</label>
+                    <select id="select-voice" class="w-full bg-brand-dark border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-brand-accent">
+                        <option value="">Chargement des voix...</option>
+                    </select>
+                </div>
+
+                <!-- Contexte / Thème -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Sujet de conversation</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button class="topic-btn border border-brand-accent bg-brand-accent/20 text-white rounded-lg p-3 text-sm font-medium transition" data-topic="general">Général</button>
+                        <button class="topic-btn border border-gray-600 hover:border-brand-accent text-gray-300 rounded-lg p-3 text-sm font-medium transition" data-topic="restaurant">Restaurant</button>
+                        <button class="topic-btn border border-gray-600 hover:border-brand-accent text-gray-300 rounded-lg p-3 text-sm font-medium transition" data-topic="travel">Voyage</button>
+                        <button class="topic-btn border border-gray-600 hover:border-brand-accent text-gray-300 rounded-lg p-3 text-sm font-medium transition" data-topic="interview">Entretien</button>
+                    </div>
+                </div>
+
+                <!-- Mémoire (Prénom) -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Votre Prénom (Mémoire logic)</label>
+                    <input type="text" id="input-username" placeholder="Ex: Juan" class="w-full bg-brand-dark border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-brand-accent">
+                </div>
+
+                <button id="btn-save-settings" class="w-full bg-brand-accent hover:bg-blue-600 text-white font-bold py-3 rounded-lg shadow-lg transition">
+                    Appliquer & Fermer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arène Principale de Conversation -->
+    <main class="flex-1 w-full flex flex-col items-center justify-center relative">
+        
+        <!-- Conteneur des Avatars -->
+        <div class="flex items-center justify-center w-full max-w-4xl gap-8 md:gap-24 px-4">
+            
+            <!-- Avatar Utilisateur (Toi) -->
+            <div class="flex flex-col items-center gap-4 transition-all duration-300" id="ui-user-wrap">
+                <div id="avatar-user" class="avatar-container w-24 h-24 md:w-32 md:h-32 rounded-full bg-brand-dark border-4 border-brand-user flex items-center justify-center overflow-hidden z-10 avatar-user">
+                    <i class="fas fa-user text-4xl md:text-5xl text-brand-user"></i>
+                </div>
+                <div class="text-center">
+                    <span class="block text-lg font-bold text-brand-user" id="display-username">Tú</span>
+                    <span class="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded-full opacity-0 transition-opacity" id="indicator-user"><i class="fas fa-microphone-lines"></i> Parle...</span>
+                </div>
+            </div>
+
+            <!-- Micro Central (Indicateur & Contrôleur d'appel) -->
+            <div class="flex flex-col items-center justify-center z-20">
+                <button id="btn-call" class="relative w-20 h-20 md:w-24 md:h-24 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-3xl shadow-2xl transition-all duration-300">
+                    <i class="fas fa-phone text-white"></i>
+                </button>
+                <p id="call-status" class="mt-4 text-sm font-medium text-gray-400">Appuyez pour appeler</p>
+            </div>
+
+            <!-- Avatar Eyano -->
+            <div class="flex flex-col items-center gap-4 transition-all duration-300" id="ui-eyano-wrap">
+                <div id="avatar-eyano" class="avatar-container w-24 h-24 md:w-32 md:h-32 rounded-full bg-brand-dark border-4 border-brand-eyano flex items-center justify-center overflow-hidden z-10 avatar-eyano">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sofia&backgroundColor=transparent" alt="Eyano" class="w-full h-full object-cover p-2">
+                </div>
+                <div class="text-center">
+                    <span class="block text-lg font-bold text-brand-eyano">Eyano</span>
+                    <span class="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded-full opacity-0 transition-opacity" id="indicator-eyano"><i class="fas fa-volume-up"></i> Écoute...</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sous-titres dynamiques (Indispensable pour aider si la reco vocale rate un mot) -->
+        <div class="absolute bottom-10 w-full max-w-2xl px-6 text-center h-20 flex items-end justify-center">
+            <p id="subtitles-display" class="text-xl md:text-2xl font-light text-gray-200 subtitles italic opacity-0 transition-opacity duration-300">
+                ...
+            </p>
+        </div>
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl opacity-0 transition-opacity z-50 flex items-center gap-3">
+        <i class="fas fa-info-circle text-brand-accent"></i>
+        <span id="toast-msg">Message</span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

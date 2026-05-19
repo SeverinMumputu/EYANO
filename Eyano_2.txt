@@ -1,0 +1,44 @@
+Eyano
+1.Quid ?
+Eyano est une plateforme conversationnelle vocale permettant la pratique de l’espagnol.
+2.Pourquoi concevoir Eyano ?
+En RDC, il est difficile de trouver de centres dédiés à l’apprentissage ou à la pratique de l’espagnol. L’apprentissage personnel peut se faire mais sans la pratique, on stagne.
+La maîtrise d’une langue se nourrit par la pratique.
+3.Objectifs.
+Eyano permettra la pratique et l’amélioration continue pour une maîtrise de l’espagnol.
+4.Fonctionnement.
+La pratique se fait par conversation(dialogue) entre le pratiquant et un avatar. Le pratiquant aura le droit de choisir et soumettre un sujet ou un thème sur lequel discuter avant le début de la conversation.
+5.Etat de l’avatar.
+L’avatar est un assistant virtuel logique sans aucune intégration de raisonnement avancé(intelligence artificielle)  basé sur des règles, contexte et mémoire pour rendre l’avatar intelligent sans IA  mais aussi formé à partir d’une vaste quantité de données textuelles qui permettent à l’avatar de comprendre le langage naturel humain.
+Les règles, contexte, la mémoire et les données textuelles(dictionnaire, conjugaison, règles de grammaire,expressions,..) ne sont qu’une base de connaissance qui joue le rôle de cadre pour éviter que l’avatar ne devienne incontrôlable.
+6.Disposition de l'avatar(Comment sera l'avatar) et de l'interface.
+Pour une communication instantanée entre l'utilisateur et Eyano afin de faciliter la fluidité du dialogue, la conversation se fera vocalement sans aucune boîte de 
+dialogue, sans un aucun champs d'entrée. La conversation se tiendra à l'exemple d'un appel téléphonique c'est-à-dire l'utilisateur commence la conversation, parle et
+Eyano répond. On adopte le comportement logique d'un appel en visant un échange fluide entre 2 personnes. 
+Et pour répondre à la question : "Comment sera l'interface ?" Crée-moi une interface premium avec deux Avatars séparés au centre par un micro qui s'anime lorsque quel
+qu'un parle. Un avatar représentant moi et l'autre pour Eyano. Rajouter une gestion logique jouant le rôle d'indicateur et controleur qui met en avant celui qui parle
+et s'occupe du passage de tour. 
+7.Composition et technologies pour le developpement de l’avatar.
+Etape 1 : L’avatar core.
+Le cerveau et le moteur de Eyano. Le but est de permettre à l’avatar de comprendre une phrase et de renvoyer une réponse vocale.
+Nous allons coder :
+- Backend Node.js local
+- Moteur de commande texte
+- Réponses vocales
+Pour créer ce moteur logique de Eyano nous utiliserons les technologies Node.js, Javascript et Express. 
+
+Étape 2: Écouter et parler
+La voix est la fonction vitale de l’avatar.
+Le rendu final est de voir l’avatar fonctionner et répondre à voix haute. Faire de l’avatar officiellelement un assistant vocal. Pour ce faire nous allons ajouer :
+- Speech-to-Text
+- Text-to-Speech
+- Synchroniser Core et UI
+Étape 3 : Contexte et Mémoire.
+Déterminer et implémenter la base de connaissance c’est-à-dire les sujets et thèmes de conversation, fournir une grande base d’informations pour rendre l’avatar intelligent sans IA. Une grande base de grammaire, conjugaison, expression pour lui permettre d’adapter ses réponses.
+L’objectif est de permettre à l’avatar de se souvenir et de répondre intelligement dans un contexte précis.
+Et pour ce faire, nous allons dévelloper :
+- MySql local
+- Mémoire simple
+- Contexte(base de connaissance)
+Étape 4 : Configuration de l’avatar
+Le but est de permettre de nommer l’avatar, choisir sa voix, lui attribuer un comportement naturel et humain. Eviter d’en faire un robot. Le naturaliser dans ses réponses et sa manière de parler.

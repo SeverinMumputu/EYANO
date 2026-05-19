@@ -1,0 +1,47 @@
+Eyano
+1.Quid ?
+Eyano est une plateforme conversationnelle orale permettant la pratique de l’espagnol.
+2.Pourquoi concevoir Eyano ?
+En RDC, il est difficile de trouver de centres dédiés à l’apprentissage ou à la pratique de l’espagnol. L’apprentissage personnel peut se faire mais sans la pratique, on stagne.
+La maîtrise d’une langue se nourrit par la pratique.
+3.Objectifs.
+Eyano permettra la pratique et l’amélioration continue pour une maîtrise de l’espagnol.
+4.Fonctionnement.
+La pratique se fait par conversation(dialogue) entre le pratiquant et un avatar. Le pratiquant aura le droit de choisir et soumettre un sujet ou un thème sur lequel discuter avant le début de la conversation.
+5.Etat de l’avatar.
+L’avatar est un assistant virtuel logique sans aucune intégration de raisonnement avancé(intelligence artificielle)  basé sur des règles, contexte et mémoire pour rendre l’avatar intelligent sans IA  mais aussi formé à partir d’une vaste quantité de données textuelles qui permettent à l’avatar de comprendre le langage naturel humain.
+Les règles, contexte, la mémoire et les données textuelles(dictionnaire, conjugaison, règles de grammaire,expressions,..) ne sont qu’une base de connaissance qui joue le rôle de cadre pour éviter que l’avatar ne devienne incontrôlable.
+6.Composition et technologies pour le developpement de l’avatar.
+Etape 1 : L’avatar core.
+Le cerveau et le moteur de Eyano. Le but est de permettre à l’avatar de comprendre une phrase et de renvoyer une réponse vocale.
+Nous allons coder :
+- Backend Node.js local
+- Moteur de commande texte
+- Réponses vocales
+Pour créer ce moteur logique de Eyano nous utiliserons les technologies Node.js, Javascript et Express.
+Étape 2 : Interface UI Eyano.
+Le centre de commande visuel pour la gestion manuelle d’Eyano à travers certains boutons et la visualisation audio-réactive de l’avatar.
+L’objectif de cette étape est de rendre l’avatar visible à l’écran avec un effet Siri-Like d’appel pour faire exister l’avatar quand il écoute et lui faire parler visuellement. Mais également envoyer les commandes(requêtes) au Core.
+Pour le centre de commande visuel nous allons coder :
+- Une interface simple
+- Zone de logs
+- Boutons systèmes.
+Pour la visualisation audio-réactive, nous allons développer :
+- Analyse amplitude audio
+- Animation réactive
+- Priorité visuelle permanente
+Étape 3: Écouter et parler
+La voix est la fonction vitale de l’avatar.
+Le rendu final est de voir l’avatar fonctionner et répondre à voix haute. Faire de l’avatar officiellelement un assistant vocal. Pour ce faire nous allons ajouer :
+- Speech-to-Text
+- Text-to-Speech
+- Synchroniser Core et UI
+Étape 4 : Contexte et Mémoire.
+Déterminer et implémenter la base de connaissance c’est-à-dire les sujets et thèmes de conversation, fournir une grande base d’informations pour rendre l’avatar intelligent sans IA. Une grande base de grammaire, conjugaison, expression pour lui permettre d’adapter ses réponses.
+L’objectif est de permettre à l’avatar de se souvenir et de répondre intelligement dans un contexte précis.
+Et pour ce faire, nous allons dévelloper :
+- MySql local
+- Mémoire simple
+- Contexte(base de connaissance)
+Étape 5 : Configuration de l’avatar
+Le but est de permettre de nommer l’avatar, choisir sa voix, lui attribuer un comportement naturel et humain. Eviter d’en faire un robot. Le naturaliser dans ses réponses et sa manière de parler.
