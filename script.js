@@ -158,6 +158,7 @@
                 this.recognition = new SpeechRecognition();
                 this.recognition.lang = 'es-ES'; // Configuration stricte en Espagnol
                 this.recognition.interimResults = false;
+                this.recognition.continuous = true;
                 this.recognition.maxAlternatives = 1;
 
                 this.recognition.onstart = () => {
@@ -276,6 +277,68 @@
                 this.onSpeechEnd('all');
             }
         }
+
+        /* =====================================================================
+   ETAPE MOBILE : AUTORISATION MICROPHONE SYSTEME
+   ===================================================================== */
+
+async function requestMobileMicrophonePermission() {
+
+    // Vérifie support navigateur
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showToast("Microphone non supporté sur cet appareil.");
+        return false;
+    }
+
+    try {
+
+        // Demande explicite d'autorisation système
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+            }
+        });
+
+        // Stop immédiat du flux après autorisation
+        stream.getTracks().forEach(track => track.stop());
+
+        showToast("Microphone autorisé avec succès.");
+        return true;
+
+    } catch (error) {
+
+        console.error("Erreur permission microphone :", error);
+
+        // Gestion intelligente mobile
+        if (
+            error.name === "NotAllowedError" ||
+            error.name === "PermissionDeniedError"
+        ) {
+
+            showToast("Veuillez autoriser le microphone dans les paramètres du navigateur.");
+
+        } else if (
+            error.name === "NotFoundError" ||
+            error.name === "DevicesNotFoundError"
+        ) {
+
+            showToast("Aucun microphone détecté.");
+
+        } else {
+
+            showToast("Impossible d'accéder au microphone.");
+        }
+
+        return false;
+    }
+}
+
+    function isMobileDevice() {
+    return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+}
+
 
         /* =====================================================================
            ETAPE 4 : SYNCHRONISATION UI ET LOGIQUE GLOBALE
@@ -404,25 +467,44 @@
             );
 
             // Gestion de l'appel
-            btnCall.addEventListener('click', () => {
-                if (!voiceCtrl.isCallActive) {
-                    // Démarrer
-                    voiceCtrl.startCall();
-                    updateCallButton(true);
-                    
-                    // Salutation initiale basée sur le thème
-                    const greeting = eyano.getGreeting();
-                    voiceCtrl.speak(greeting, () => {
-                        // Le callback s'exécute quand Eyano a fini de parler.
-                        // La reco vocale démarre automatiquement (géré dans voiceCtrl)
-                    });
-                } else {
-                    // Raccrocher
-                    voiceCtrl.endCall();
-                    updateCallButton(false);
-                    setSubtitle("", "user");
-                }
-            });
+            btnCall.addEventListener('click', async () => {
+
+    // =========================
+    // MODE DEMARRAGE APPEL
+    // =========================
+    if (!voiceCtrl.isCallActive) {
+
+        // MOBILE : demande permission système AVANT toute reconnaissance
+        if (isMobileDevice()) {
+
+            const granted = await requestMobileMicrophonePermission();
+
+            if (!granted) {
+                return;
+            }
+        }
+
+        // Démarrer appel
+        voiceCtrl.startCall();
+        updateCallButton(true);
+
+        // Salutation initiale
+        const greeting = eyano.getGreeting();
+
+        voiceCtrl.speak(greeting, () => {
+            // Reconnaissance relancée automatiquement
+        });
+
+    } else {
+
+        // =========================
+        // MODE FIN APPEL
+        // =========================
+        voiceCtrl.endCall();
+        updateCallButton(false);
+        setSubtitle("", "user");
+    }
+});
 
             // Gestion de la modale de configuration
             const modal = document.getElementById('modal-settings');
