@@ -89,6 +89,48 @@
         .subtitles {
             text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
+        /* Responsive mobile premium */
+@media (max-width: 768px) {
+
+    body {
+        overflow-y: auto;
+    }
+
+    main {
+        justify-content: center;
+    }
+
+    #call-status {
+        font-size: 0.85rem;
+        text-align: center;
+    }
+
+    .subtitles {
+        padding-bottom: 10px;
+    }
+
+    .avatar-speaking-eyano::before,
+    .avatar-speaking-user::before {
+        width: 90%;
+        height: 90%;
+    }
+}
+
+/* Très petits écrans */
+@media (max-width: 420px) {
+
+    header {
+        padding-top: 1rem;
+    }
+
+    #subtitles-display {
+        font-size: 0.95rem;
+    }
+
+    #call-status {
+        max-width: 120px;
+    }
+}
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col items-center justify-between font-sans relative">
